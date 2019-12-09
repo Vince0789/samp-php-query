@@ -12,6 +12,9 @@ final class Socket
 
     private $connectionTimeout;
 
+    /**
+     * @throws RuntimeException
+     */
     private function __construct(Server $server, int $connectionTimeout = 5) {
         $this->server = $server;
         $this->connectionTimeout = $connectionTimeout;
@@ -35,6 +38,10 @@ final class Socket
         return $this->server;
     }
 
+    public function getConnectionTimeout(): int {
+        return $this->connectionTimeout;
+    }
+
     /**
      * @throws RuntimeException
      */
@@ -51,7 +58,7 @@ final class Socket
         );
 
         if($errno !== 0 || !is_resource($resource)) {
-            throw new RuntimeException('failed to open socket');
+            throw new RuntimeException(sprintf('Failed to open socket (error %d: %s).', $errno, $errstr));
         }
 
         return $resource;
@@ -65,21 +72,36 @@ final class Socket
         return false;
     }
 
+    /**
+     * @throws RuntimeException
+     */
     public function send(Packet $packet): int {
         $bytes = fwrite($this->resource, (string) $packet);
         if($bytes === false) {
-            throw new RuntimeException('failed to send packet');
+            throw new RuntimeException('Failed to send packet.');
         }
 
         return $bytes;
     }
 
-    public function readInt(int $bytes = 2): int {
+    public function readBool(int $bytes = 1): bool {
+        return (bool) $this->readInt($bytes);
+    }
+
+    public function readInt(int $bytes): int {
         return ord($this->readRaw($bytes));
     }
 
-    public function readBool(int $bytes = 1): bool {
-        return (bool) ord($this->readRaw($bytes));
+    public function readInt8(): int {
+        return $this->readInt(1);
+    }
+
+    public function readInt16(): int {
+        return $this->readInt(2);
+    }
+
+    public function readInt32(): int {
+        return $this->readInt(4);
     }
 
     public function readString(int $lengthBytes = 4): string {
@@ -87,10 +109,13 @@ final class Socket
         return ($strlen > 0) ? $this->readRaw($strlen) : '';
     }
 
-    public function readRaw(int $bytes = 2): string {
+    /**
+     * @throws RuntimeException
+     */
+    public function readRaw(int $bytes): string {
         $response = fread($this->resource, $bytes);
         if($response === false) {
-            throw new RuntimeException('failed to read response');
+            throw new RuntimeException(sprintf('Failed to read response (bytes: %d).', $bytes));
         }
 
         return $response;

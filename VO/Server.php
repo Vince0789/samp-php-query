@@ -8,6 +8,9 @@ final class Server
 
     private $port;
 
+    /**
+     * @throws InvalidArgumentException
+     */
     private function __construct(string $host, int $port) {
         $validHost = filter_var($host, FILTER_VALIDATE_IP, array('flags' => FILTER_FLAG_IPV4));
         

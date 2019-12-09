@@ -15,6 +15,9 @@ final class InfoType
 
     private $infoType;
 
+    /**
+     * @throws InvalidArgumentException
+     */
     private function __construct(string $infoType) {
         if(!in_array($infoType, array_keys(self::ALLOWED_TYPES), true)) {
             throw new InvalidArgumentException(sprintf('invalid info type detected: %s', $infoType));
@@ -27,6 +30,9 @@ final class InfoType
         return new self($infoType);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public static function fromPayload(string $payload): self {
         if(!in_array($payload, self::ALLOWED_TYPES, true)) {
             throw new InvalidArgumentException(sprintf('invalid info type payload detected: %s', $payload));

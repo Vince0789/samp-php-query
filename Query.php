@@ -25,8 +25,8 @@ final class Query
 
         return [
             'password'      => $this->socket->readBool(),
-            'players'       => $this->socket->readInt(),
-            'max_players'   => $this->socket->readInt(),
+            'players'       => $this->socket->readInt16(),
+            'max_players'   => $this->socket->readInt16(),
             'hostname'      => $this->socket->readString(),
             'gamemode'      => $this->socket->readString(),
             'language'      => $this->socket->readString(),
