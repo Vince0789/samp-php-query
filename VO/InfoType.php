@@ -15,38 +15,37 @@ final class InfoType
 
     private $infoType;
 
-    /**
-     * @throws InvalidArgumentException
-     */
     private function __construct(string $infoType) {
-        if(!in_array($infoType, array_keys(self::ALLOWED_TYPES), true)) {
-            throw new InvalidArgumentException(sprintf('invalid info type detected: %s', $infoType));
-        }
-
         $this->infoType = $infoType;
     }
 
-    public static function fromName(string $infoType): self {
-        return new self($infoType);
+    /**
+     * @throws InvalidArgumentException
+     */
+    public static function fromName(string $name): self {
+        if(!in_array($name, array_keys(self::ALLOWED_TYPES), true)) {
+            throw new InvalidArgumentException(sprintf('invalid info type name detected: %s', $name));
+        }
+        return new self($name);
     }
 
     /**
      * @throws InvalidArgumentException
      */
-    public static function fromPayload(string $payload): self {
-        if(!in_array($payload, self::ALLOWED_TYPES, true)) {
-            throw new InvalidArgumentException(sprintf('invalid info type payload detected: %s', $payload));
+    public static function fromType(string $type): self {
+        $name = array_search($type, self::ALLOWED_TYPES);
+        if($name === false) {
+            throw new InvalidArgumentException(sprintf('invalid info type detected: %s', $type));
         }
 
-        $infoType = array_search($payload);
-        return new self($infoType);
+        return new self($name);
     }
 
     public function __toString(): string {
         return (string) $this->infoType;
     }
 
-    public function getPayload(): string {
+    public function getType(): string {
         return (string) self::ALLOWED_TYPES[$this->infoType];
     }
 }

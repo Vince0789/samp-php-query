@@ -16,16 +16,22 @@ final class Packet
      */
     private $infoType;
 
-    public function __construct(Server $server, InfoType $infoType) {
+    /**
+     * @var string
+     */
+    private $payload;
+
+    public function __construct(Server $server, InfoType $infoType, ?string $payload = null) {
         $this->server = $server;
         $this->infoType = $infoType;
+        $this->payload = $payload;
     }
 
     public function __toString(): string {
-        return $this->getHeader() . $this->infoType->getPayload();
+        return $this->getHeader($this->infoType) . $this->getPayload();
     }
 
-    private function getHeader(): string {
+    public function getHeader(InfoType $infoType): string {
         $header = 'SAMP';
         $octets = explode('.', $this->server->getHost());
 
@@ -35,7 +41,12 @@ final class Packet
 
         $header .= chr($this->server->getPort() & 0xFF);
         $header .= chr($this->server->getPort() >> 8 & 0xFF);
+        $header .= $infoType->getType();
 
         return $header;
+    }
+
+    public function getPayload(): string {
+        return $this->payload ?? '';
     }
 }
