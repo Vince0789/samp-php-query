@@ -88,8 +88,22 @@ final class Socket
         return (bool) $this->readInt($bytes);
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function readInt(int $bytes): int {
-        return ord($this->readRaw($bytes));
+        if($bytes < 1 || $bytes > 4) {
+            throw new InvalidArgumentException(sprintf('cannot read integer of %d bytes', $bytes));
+        }
+
+        $buffer = $this->readRaw($bytes);
+        $int = 0;
+
+        for($i = 0; $i < $bytes; $i++) {
+            $int |= ord($buffer{$i}) << ($i * 8);
+        }
+
+        return $int;
     }
 
     public function readInt8(): int {
