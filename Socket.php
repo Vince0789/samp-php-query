@@ -30,8 +30,8 @@ final class Socket
         $this->closeSocket();
     }
 
-    public static function open(Server $server): self {
-        return new self($server);
+    public static function open(Server $server, int $connectionTimeout = 5): self {
+        return new self($server, $connectionTimeout);
     }
 
     public function getServer(): Server {
@@ -60,6 +60,8 @@ final class Socket
         if($errno !== 0 || !is_resource($resource)) {
             throw new RuntimeException(sprintf('Failed to open socket (error %d: %s).', $errno, $errstr));
         }
+
+        stream_set_timeout($resource, $this->connectionTimeout);
 
         return $resource;
     }

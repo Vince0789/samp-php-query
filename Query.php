@@ -21,7 +21,7 @@ final class Query
         $packet = new Packet(
             $this->socket->getServer(), 
             InfoType::fromName('ping'),
-            $payload = (string) mt_rand(1000, 9999)
+            $payload = random_bytes(4)
         );
 
         $start = microtime(true);
